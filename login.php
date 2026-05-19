@@ -101,8 +101,49 @@ body{
 
         <p class="mt-3 text-center">
             Login with
-            <span class="toggle-btn" onclick="showRegister()">
+            <span class="toggle-btn" onclick="showLoginPhone()">
                 Phone Number
+            </span>
+            instead.
+        </p>
+
+        <p class="mt-3 text-center">
+            Don't have account?
+            <span class="toggle-btn" onclick="showRegister()">
+                Register
+            </span>
+        </p>
+
+    </form>
+
+    <form method="POST" id="loginFormPhone" class="hidden">
+
+        <input type="hidden" name="action" value="loginphone">
+
+        <div class="mb-3">
+            <input type="tel"
+                   name="phone"
+                   class="form-control"
+                   placeholder="Phone Number"
+                   required>
+        </div>
+
+        <div class="mb-3">
+            <input type="password"
+                   name="password"
+                   class="form-control"
+                   placeholder="Password"
+                   required>
+        </div>
+
+        <button class="btn btn-primary w-100">
+            Login
+        </button>
+
+        <p class="mt-3 text-center">
+            Login with
+            <span class="toggle-btn" onclick="showLogin()">
+                Email Instead
             </span>
             instead.
         </p>
@@ -171,12 +212,20 @@ body{
 
 function showRegister(){
     document.getElementById("loginForm").classList.add("hidden");
+    document.getElementById("loginFormPhone").classList.add("hidden");
     document.getElementById("registerForm").classList.remove("hidden");
 }
 
 function showLogin(){
     document.getElementById("registerForm").classList.add("hidden");
+    document.getElementById("loginFormPhone").classList.add("hidden");
     document.getElementById("loginForm").classList.remove("hidden");
+}
+
+function showLoginPhone(){
+    document.getElementById("registerForm").classList.add("hidden");
+    document.getElementById("loginForm").classList.add("hidden");
+    document.getElementById("loginFormPhone").classList.remove("hidden");
 }
 
 const darkBtn = document.getElementById("darkToggle");

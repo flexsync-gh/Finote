@@ -76,5 +76,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         }
     }
+
+    if ($action == "loginphone") {
+
+        $phone = trim($_POST['phone']);
+        $password = $_POST['password'];
+
+        $sql = "SELECT * FROM users WHERE phonenumber='$phone'";
+        $result = mysqli_query($conn, $sql);
+
+        if (mysqli_num_rows($result) > 0) {
+
+            $user = mysqli_fetch_assoc($result);
+
+            if (password_verify($password, $user['password'])) {
+
+                $_SESSION['user'] = $user['username'];
+
+                header("Location: dashboard.php");
+                exit();
+
+            } else {
+
+                $message = "Wrong password.";
+
+            }
+
+        } else {
+
+            $message = "Account not found.";
+
+        }
+    }
 }
 ?>
