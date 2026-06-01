@@ -455,7 +455,7 @@ body::after{
     <small>Finote Personal Finance</small>
 </aside>
 
-<button id="darkToggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">
+<button id="darkToggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" data-theme-toggle>
     <span class="toggle-icon">&#9728;</span>
     <span class="toggle-icon">&#9790;</span>
 </button>
@@ -633,30 +633,8 @@ function showLoginPhone(){
     document.getElementById("loginFormPhone").classList.remove("hidden");
 }
 
-const darkBtn = document.getElementById("darkToggle");
-
-if(localStorage.getItem("darkMode") === "enabled"){
-    document.body.classList.add("dark-mode");
-    darkBtn.setAttribute("aria-pressed","true");
-}else{
-    darkBtn.setAttribute("aria-pressed","false");
-}
-
-darkBtn.addEventListener("click", () => {
-
-    document.body.classList.toggle("dark-mode");
-
-    if(document.body.classList.contains("dark-mode")){
-        localStorage.setItem("darkMode","enabled");
-        darkBtn.setAttribute("aria-pressed","true");
-    }else{
-        localStorage.setItem("darkMode","disabled");
-        darkBtn.setAttribute("aria-pressed","false");
-    }
-
-});
-
 </script>
+<script src="assets/js/theme.js"></script>
 
 </body>
 </html>

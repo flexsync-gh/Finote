@@ -128,7 +128,7 @@
           <a class="btn btn-warning text-white" href="login.php">Try Now</a>
         </li>
         <li class="nav-item">
-          <button id="darkToggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">
+          <button id="darkToggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" data-theme-toggle>
             <span class="toggle-icon">&#9728;</span>
             <span class="toggle-icon">&#9790;</span>
           </button>
@@ -223,28 +223,6 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-  const toggleBtn = document.getElementById("darkToggle");
-
-  if (localStorage.getItem("darkMode") === "enabled") {
-    document.body.classList.add("dark-mode");
-    toggleBtn.setAttribute("aria-pressed", "true");
-  } else {
-    toggleBtn.setAttribute("aria-pressed", "false");
-  }
-
-  toggleBtn.addEventListener("click", () => {
-    document.body.classList.toggle("dark-mode");
-
-    if (document.body.classList.contains("dark-mode")) {
-      localStorage.setItem("darkMode", "enabled");
-      toggleBtn.setAttribute("aria-pressed", "true");
-    } else {
-      localStorage.setItem("darkMode", "disabled");
-      toggleBtn.setAttribute("aria-pressed", "false");
-    }
-  });
-</script>
+<script src="assets/js/theme.js"></script>
 </body>
 </html>

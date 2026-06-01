@@ -20,7 +20,7 @@ $navUser = $navUser ?? null;
                     <a class="nav-link <?php echo $activePage === 'profile' ? 'active' : ''; ?>" href="<?php echo e(app_url('profile.php')); ?>">Profile</a>
                 </li>
                 <li class="nav-item d-flex align-items-center">
-                    <button id="appDarkToggle" class="app-theme-toggle" type="button" aria-label="Toggle dark mode">
+                    <button id="appDarkToggle" class="app-theme-toggle" type="button" aria-label="Toggle dark mode" data-theme-toggle>
                         <span class="toggle-icon">&#9728;</span>
                         <span class="toggle-icon">&#9790;</span>
                     </button>
