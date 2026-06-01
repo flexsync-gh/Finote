@@ -73,6 +73,7 @@ body::after{
 }
 
 .auth-shell{
+    position:relative;
     width:100%;
     max-width:980px;
     display:grid;
@@ -121,6 +122,41 @@ body::after{
     font-size:1.35rem;
 }
 
+.brand-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+}
+
+.brand-actions{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.back-home{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    min-height:38px;
+    padding:0 14px;
+    border-radius:999px;
+    color:white;
+    text-decoration:none;
+    font-weight:700;
+    background:rgba(255,255,255,0.14);
+    border:1px solid rgba(255,255,255,0.2);
+    transition:background 0.2s ease,transform 0.2s ease;
+}
+
+.back-home:hover,
+.back-home:focus{
+    color:white;
+    background:rgba(255,255,255,0.22);
+    transform:translateY(-1px);
+}
+
 .brand-panel h1{
     max-width:360px;
     margin:28px 0 14px;
@@ -163,14 +199,8 @@ body::after{
 
 .auth-content{
     position:relative;
-    padding:44px 42px;
+    padding:116px 42px 44px;
     background:var(--card);
-}
-
-.auth-top{
-    display:flex;
-    justify-content:flex-end;
-    margin-bottom:34px;
 }
 
 .auth-box{
@@ -231,7 +261,10 @@ body::after{
 .theme-toggle{
     width:76px;
     height:38px;
-    position:relative;
+    position:absolute;
+    top:44px;
+    right:42px;
+    z-index:3;
     display:inline-flex;
     align-items:center;
     justify-content:space-between;
@@ -318,6 +351,30 @@ body::after{
         padding:32px;
     }
 
+    .brand-header{
+        align-items:flex-start;
+    }
+
+    .brand-actions{
+        padding-top:48px;
+        align-items:flex-end;
+    }
+
+    .back-home{
+        min-height:34px;
+        padding:0 12px;
+        font-size:0.92rem;
+    }
+
+    .theme-toggle{
+        top:32px;
+        right:32px;
+        border-color:rgba(255,255,255,0.24);
+        background:rgba(255,255,255,0.16);
+        color:rgba(255,255,255,0.84);
+        box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08),0 10px 24px rgba(45,32,101,0.12);
+    }
+
     .brand-panel h1{
         font-size:2rem;
     }
@@ -331,6 +388,42 @@ body::after{
     }
 }
 
+@media (max-width: 430px){
+    .brand-panel{
+        padding:26px 22px;
+    }
+
+    .brand-header{
+        gap:12px;
+    }
+
+    .brand-actions{
+        padding-top:46px;
+    }
+
+    .brand-logo{
+        width:48px;
+        height:48px;
+        border-radius:16px;
+    }
+
+    .theme-toggle{
+        top:26px;
+        right:22px;
+        width:70px;
+        height:36px;
+    }
+
+    .theme-toggle::after{
+        width:26px;
+        height:26px;
+    }
+
+    .dark-mode .theme-toggle::after{
+        transform:translateX(34px);
+    }
+}
+
 </style>
 
 </head>
@@ -340,7 +433,15 @@ body::after{
 <section class="auth-shell">
 <aside class="brand-panel">
     <div>
-        <div class="brand-logo">Fi</div>
+        <div class="brand-header">
+            <div class="brand-logo">Fi</div>
+            <div class="brand-actions">
+                <a class="back-home" href="index.php" aria-label="Back to Home">
+                    <span aria-hidden="true">&larr;</span>
+                    Back to Home
+                </a>
+            </div>
+        </div>
         <h1>Money notes that feel calm and clear.</h1>
         <p>Track spending, budgets, and personal finance goals in one clean workspace.</p>
 
@@ -354,14 +455,12 @@ body::after{
     <small>Finote Personal Finance</small>
 </aside>
 
-<div class="auth-content">
-<div class="auth-top">
-    <button id="darkToggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">
-        <span class="toggle-icon">&#9728;</span>
-        <span class="toggle-icon">&#9790;</span>
-    </button>
-</div>
+<button id="darkToggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">
+    <span class="toggle-icon">&#9728;</span>
+    <span class="toggle-icon">&#9790;</span>
+</button>
 
+<div class="auth-content">
 <div class="auth-box">
 
     <h2 class="text-center mb-4">Finote</h2>
