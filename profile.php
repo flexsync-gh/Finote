@@ -11,6 +11,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect(app_url('profile.php'));
     }
 
+    $action = $_POST['action'] ?? 'upload_photo';
+
+    if ($action === 'remove_photo') {
+        if (empty($user['profile_photo'])) {
+            flash('error', 'You are already using the default avatar.');
+            redirect(app_url('profile.php'));
+        }
+
+        $oldPhoto = $user['profile_photo'];
+        db_execute($conn, 'UPDATE users SET profile_photo = NULL WHERE id = ?', 'i', [$user['id']]);
+        delete_profile_photo($oldPhoto);
+
+        flash('success', 'Profile photo removed. Your default avatar is back.');
+        redirect(app_url('profile.php'));
+    }
+
     [$isValid, $result] = validate_profile_upload($_FILES['profile_photo'] ?? null);
 
     if (!$isValid) {
@@ -81,10 +97,25 @@ require __DIR__ . '/includes/navbar.php';
 
                     <form method="POST" enctype="multipart/form-data">
                         <?php echo csrf_field(); ?>
+                        <input type="hidden" name="action" value="upload_photo">
                         <label class="form-label fw-semibold" for="profilePhoto">Upload profile photo</label>
                         <input id="profilePhoto" class="form-control" type="file" name="profile_photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" required>
                         <div class="form-text">JPG, PNG, or WEBP. Maximum size: 2MB.</div>
-                        <button class="btn btn-primary mt-3" type="submit">Save Photo</button>
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            <button class="btn btn-primary" type="submit">Save Photo</button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <form method="POST" onsubmit="return confirm('Remove your current profile photo and use the default avatar?');">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="action" value="remove_photo">
+                        <h3 class="h5 fw-bold mb-1">Reset profile photo</h3>
+                        <p class="text-muted mb-3">Remove your uploaded image and return to the default Finote avatar.</p>
+                        <button class="btn btn-outline-danger" type="submit" <?php echo empty($user['profile_photo']) ? 'disabled' : ''; ?>>
+                            Remove Photo
+                        </button>
                     </form>
                 </div>
             </div>
