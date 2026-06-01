@@ -469,13 +469,14 @@ body::after{
     <?php if($message != "") { ?>
 
         <div class="alert alert-warning">
-            <?php echo $message; ?>
+            <?php echo e($message); ?>
         </div>
 
     <?php } ?>
 
     <form method="POST" id="loginForm">
 
+        <?php echo csrf_field(); ?>
         <input type="hidden" name="action" value="login">
 
         <div class="mb-3">
@@ -517,6 +518,7 @@ body::after{
 
     <form method="POST" id="loginFormPhone" class="hidden">
 
+        <?php echo csrf_field(); ?>
         <input type="hidden" name="action" value="loginphone">
 
         <div class="mb-3">
@@ -558,6 +560,7 @@ body::after{
 
     <form method="POST" id="registerForm" class="hidden">
 
+        <?php echo csrf_field(); ?>
         <input type="hidden" name="action" value="register">
 
         <div class="mb-3">

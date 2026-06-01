@@ -1,0 +1,136 @@
+:root{
+    --primary:#5b3be0;
+    --secondary:#8c62ff;
+    --accent:#ffb02e;
+    --background:#f7f4ff;
+    --surface:#ffffff;
+    --text:#17152b;
+    --muted:#716b87;
+    --success:#14a46c;
+    --danger:#dc3545;
+    --warning:#ff9f43;
+    --line:rgba(91,59,224,0.14);
+}
+
+body.app-body{
+    min-height:100vh;
+    color:var(--text);
+    background:
+        radial-gradient(circle at top left, rgba(140,98,255,0.18), transparent 30rem),
+        linear-gradient(135deg,#f7f4ff 0%,#ffffff 52%,#eef0ff 100%);
+}
+
+.app-navbar{
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
+    box-shadow:0 12px 28px rgba(45,32,101,0.14);
+}
+
+.app-navbar .navbar-brand,
+.app-navbar .nav-link{
+    color:#ffffff;
+}
+
+.app-navbar .nav-link{
+    opacity:0.82;
+    font-weight:600;
+}
+
+.app-navbar .nav-link.active,
+.app-navbar .nav-link:hover{
+    color:#ffffff;
+    opacity:1;
+}
+
+.app-main{
+    padding:34px 0;
+}
+
+.page-title{
+    font-weight:800;
+    letter-spacing:0;
+}
+
+.app-card{
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:rgba(255,255,255,0.88);
+    box-shadow:0 16px 40px rgba(45,32,101,0.1);
+}
+
+.summary-card{
+    border:0;
+    border-radius:18px;
+    color:#fff;
+    box-shadow:0 16px 32px rgba(45,32,101,0.14);
+}
+
+.summary-income{background:linear-gradient(135deg,#14a46c,#3fd28d);}
+.summary-expense{background:linear-gradient(135deg,#dc3545,#ff7b7b);}
+.summary-balance{background:linear-gradient(135deg,var(--primary),var(--secondary));}
+
+.btn-primary{
+    border:0;
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
+}
+
+.btn-primary:hover{
+    background:linear-gradient(135deg,#4e31c9,#7c55ef);
+}
+
+.form-control,
+.form-select{
+    min-height:46px;
+    border-radius:12px;
+    border-color:#e1def0;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color:var(--secondary);
+    box-shadow:0 0 0 0.22rem rgba(91,59,224,0.13);
+}
+
+.table{
+    vertical-align:middle;
+}
+
+.badge-soft-income{
+    color:#087a4c;
+    background:#dff8ed;
+}
+
+.badge-soft-expense{
+    color:#a4152b;
+    background:#ffe4e8;
+}
+
+.empty-state{
+    padding:44px 18px;
+    text-align:center;
+    color:var(--muted);
+}
+
+.avatar-lg{
+    width:132px;
+    height:132px;
+    object-fit:cover;
+    border-radius:28px;
+    border:4px solid #fff;
+    box-shadow:0 16px 34px rgba(45,32,101,0.18);
+}
+
+.transaction-description mark{
+    padding:0 2px;
+    border-radius:4px;
+    background:#fff1b8;
+}
+
+@media (max-width: 768px){
+    .app-main{
+        padding:24px 0;
+    }
+
+    .table-responsive{
+        border-radius:14px;
+    }
+}
