@@ -58,6 +58,52 @@
       body.dark-mode .prev-img{
         background: linear-gradient(135deg,#1a1a2e,#252541);
       }
+
+      .theme-toggle{
+        width:70px;
+        height:34px;
+        position:relative;
+        display:inline-flex;
+        align-items:center;
+        justify-content:space-between;
+        padding:0 10px;
+        border:1px solid rgba(255,255,255,0.32);
+        border-radius:999px;
+        background:rgba(255,255,255,0.16);
+        color:rgba(255,255,255,0.82);
+        box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08);
+      }
+
+      .theme-toggle .toggle-icon{
+        position:relative;
+        z-index:1;
+        font-size:13px;
+        line-height:1;
+      }
+
+      .theme-toggle::after{
+        content:"";
+        position:absolute;
+        top:4px;
+        left:4px;
+        width:26px;
+        height:26px;
+        border-radius:50%;
+        background:linear-gradient(135deg,#ffd76a,#ff9f43);
+        box-shadow:0 4px 10px rgba(255,159,67,0.35);
+        transition:transform 0.25s ease,background 0.25s ease;
+      }
+
+      body.dark-mode .theme-toggle{
+        background:rgba(255,255,255,0.08);
+        border-color:rgba(255,255,255,0.16);
+      }
+
+      body.dark-mode .theme-toggle::after{
+        transform:translateX(36px);
+        background:linear-gradient(135deg,#d9dcff,#8c62ff);
+        box-shadow:0 4px 10px rgba(140,98,255,0.36);
+      }
     </style>
 </head>
 <body>
@@ -82,8 +128,9 @@
           <a class="btn btn-warning text-white" href="login.php">Try Now</a>
         </li>
         <li class="nav-item">
-          <button id="darkToggle" class="btn btn-outline-light btn-sm">
-          🌙
+          <button id="darkToggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">
+            <span class="toggle-icon">&#9728;</span>
+            <span class="toggle-icon">&#9790;</span>
           </button>
         </li>
       </ul>
@@ -182,7 +229,9 @@
 
   if (localStorage.getItem("darkMode") === "enabled") {
     document.body.classList.add("dark-mode");
-    toggleBtn.textContent = "🌙";
+    toggleBtn.setAttribute("aria-pressed", "true");
+  } else {
+    toggleBtn.setAttribute("aria-pressed", "false");
   }
 
   toggleBtn.addEventListener("click", () => {
@@ -190,10 +239,10 @@
 
     if (document.body.classList.contains("dark-mode")) {
       localStorage.setItem("darkMode", "enabled");
-      toggleBtn.textContent = "🌙";
+      toggleBtn.setAttribute("aria-pressed", "true");
     } else {
       localStorage.setItem("darkMode", "disabled");
-      toggleBtn.textContent = "☀️";
+      toggleBtn.setAttribute("aria-pressed", "false");
     }
   });
 </script>
