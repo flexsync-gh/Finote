@@ -15,12 +15,12 @@ $type = $_GET['type'] ?? '';
 $dateFrom = trim($_GET['date_from'] ?? '');
 $dateTo = trim($_GET['date_to'] ?? '');
 
-$where = ['t.userid = ?'];
+$where = ['v.userid = ?'];
 $types = 'i';
 $params = [$userId];
 
 if ($q !== '') {
-    $where[] = 't.description LIKE ?';
+    $where[] = 'v.description LIKE ?';
     $types .= 's';
     $params[] = '%' . $q . '%';
 }
@@ -38,19 +38,19 @@ if ($categoryId > 0) {
 }
 
 if (in_array($type, ['income', 'expense'], true)) {
-    $where[] = 't.type = ?';
+    $where[] = 'v.type = ?';
     $types .= 's';
     $params[] = $type;
 }
 
 if ($dateFrom !== '' && valid_transaction_date($dateFrom)) {
-    $where[] = 't.transaction_date >= ?';
+    $where[] = 'v.transaction_date >= ?';
     $types .= 's';
     $params[] = $dateFrom;
 }
 
 if ($dateTo !== '' && valid_transaction_date($dateTo)) {
-    $where[] = 't.transaction_date <= ?';
+    $where[] = 'v.transaction_date <= ?';
     $types .= 's';
     $params[] = $dateTo;
 }
@@ -59,7 +59,12 @@ $whereSql = implode(' AND ', $where);
 $perPage = 10;
 $page = max(1, (int) ($_GET['page'] ?? 1));
 
-$countRow = db_fetch_one($conn, "SELECT COUNT(*) AS total FROM transactions t WHERE $whereSql", $types, $params);
+// Procedure example: the SQL dump defines GetLaporanKeuanganUser(IN p_userid),
+// so it cannot replace the filtered/paginated report query below.
+// Prepared call example for an unfiltered report: db_fetch_all($conn, 'CALL GetLaporanKeuanganUser(?)', 'i', [$userId]);
+$reportSource = 'v_laporan_transaksi v INNER JOIN transactions t ON t.id = v.id_transaksi';
+
+$countRow = db_fetch_one($conn, "SELECT COUNT(*) AS total FROM $reportSource WHERE $whereSql", $types, $params);
 $totalRows = (int) ($countRow['total'] ?? 0);
 $totalPages = max(1, (int) ceil($totalRows / $perPage));
 $page = min($page, $totalPages);
@@ -70,12 +75,18 @@ $listParams = array_merge($params, [$perPage, $offset]);
 
 $transactions = db_fetch_all(
     $conn,
-    "SELECT t.id, t.amount, t.description, t.type, t.transaction_date, a.name AS account_name, c.name AS category_name
-     FROM transactions t
-     LEFT JOIN accounts a ON a.id = t.accountid
-     LEFT JOIN categories c ON c.id = t.categoryid
+    "SELECT
+        v.id_transaksi AS id,
+        v.amount,
+        v.description,
+        v.type,
+        v.transaction_date,
+        v.nama_akun AS account_name,
+        v.nama_kategori AS category_name,
+        v.status_transaksi
+     FROM $reportSource
      WHERE $whereSql
-     ORDER BY t.transaction_date DESC, t.id DESC
+     ORDER BY v.transaction_date DESC, v.id_transaksi DESC
      LIMIT ? OFFSET ?",
     $listTypes,
     $listParams
@@ -183,6 +194,7 @@ require __DIR__ . '/../includes/navbar.php';
                                         <span class="badge <?php echo $transaction['type'] === 'income' ? 'badge-soft-income' : 'badge-soft-expense'; ?>">
                                             <?php echo e(ucfirst($transaction['type'])); ?>
                                         </span>
+                                        <div class="small text-muted"><?php echo e($transaction['status_transaksi'] ?? '-'); ?></div>
                                     </td>
                                     <td class="text-end fw-semibold"><?php echo e(money($transaction['amount'])); ?></td>
                                     <td class="text-end">

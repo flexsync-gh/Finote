@@ -8,10 +8,8 @@ $userId = (int) $_SESSION['user_id'];
 
 $summary = db_fetch_one(
     $conn,
-    "SELECT
-        COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) AS total_income,
-        COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS total_expense
-     FROM transactions
+    "SELECT *
+     FROM v_ringkasan_keuangan_user
      WHERE userid = ?",
     'i',
     [$userId]
@@ -19,20 +17,18 @@ $summary = db_fetch_one(
 
 $recentTransactions = db_fetch_all(
     $conn,
-    "SELECT t.id, t.amount, t.type, t.description, t.transaction_date, a.name AS account_name, c.name AS category_name
-     FROM transactions t
-     LEFT JOIN accounts a ON a.id = t.accountid
-     LEFT JOIN categories c ON c.id = t.categoryid
-     WHERE t.userid = ?
-     ORDER BY t.transaction_date DESC, t.id DESC
+    "SELECT id_transaksi AS id, amount, type, description, transaction_date, nama_akun AS account_name, nama_kategori AS category_name, status_transaksi
+     FROM v_laporan_transaksi
+     WHERE userid = ?
+     ORDER BY transaction_date DESC, id_transaksi DESC
      LIMIT 5",
     'i',
     [$userId]
 );
 
-$totalIncome = (float) $summary['total_income'];
-$totalExpense = (float) $summary['total_expense'];
-$balance = $totalIncome - $totalExpense;
+$totalIncome = (float) ($summary['total_income'] ?? 0);
+$totalExpense = (float) ($summary['total_expense'] ?? 0);
+$balance = (float) ($summary['saldo_bersih'] ?? 0);
 
 $pageTitle = 'Dashboard - Finote';
 $activePage = 'dashboard';
