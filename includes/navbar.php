@@ -17,6 +17,12 @@ $navUser = $navUser ?? null;
                     <a class="nav-link <?php echo $activePage === 'transactions' ? 'active' : ''; ?>" href="<?php echo e(app_url('transactions/index.php')); ?>">Transactions</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link <?php echo $activePage === 'accounts' ? 'active' : ''; ?>" href="<?php echo e(app_url('accounts/index.php')); ?>">Accounts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo $activePage === 'categories' ? 'active' : ''; ?>" href="<?php echo e(app_url('categories/index.php')); ?>">Categories</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link <?php echo $activePage === 'profile' ? 'active' : ''; ?>" href="<?php echo e(app_url('profile.php')); ?>">Profile</a>
                 </li>
                 <li class="nav-item d-flex align-items-center">

@@ -31,7 +31,7 @@ function app_base_path()
 {
     $dir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
 
-    if (preg_match('#/transactions$#', $dir)) {
+    if (preg_match('#/(transactions|accounts|categories)$#', $dir)) {
         $dir = dirname($dir);
     }
 
@@ -56,6 +56,11 @@ function redirect($path)
 function is_logged_in()
 {
     return !empty($_SESSION['user_id']);
+}
+
+function current_user_id()
+{
+    return (int) ($_SESSION['user_id'] ?? 0);
 }
 
 function require_login()
@@ -201,6 +206,143 @@ function ensure_user_starter_data($conn, $userId)
         db_execute($conn, 'INSERT INTO categories (userid, name, type) VALUES (?, ?, ?)', 'iss', [$userId, 'Income', 'income']);
         db_execute($conn, 'INSERT INTO categories (userid, name, type) VALUES (?, ?, ?)', 'iss', [$userId, 'General Expense', 'expense']);
     }
+}
+
+function account_limit()
+{
+    return 20;
+}
+
+function category_limit()
+{
+    return 50;
+}
+
+function text_length($value)
+{
+    return function_exists('mb_strlen') ? mb_strlen($value, 'UTF-8') : strlen($value);
+}
+
+function account_count($conn, $userId)
+{
+    $row = db_fetch_one($conn, 'SELECT COUNT(*) AS total FROM accounts WHERE userid = ?', 'i', [$userId]);
+    return (int) ($row['total'] ?? 0);
+}
+
+function category_count($conn, $userId)
+{
+    $row = db_fetch_one($conn, 'SELECT COUNT(*) AS total FROM categories WHERE userid = ?', 'i', [$userId]);
+    return (int) ($row['total'] ?? 0);
+}
+
+function find_account($conn, $userId, $accountId)
+{
+    return db_fetch_one(
+        $conn,
+        'SELECT id, userid, name, type, balance FROM accounts WHERE id = ? AND userid = ? LIMIT 1',
+        'ii',
+        [$accountId, $userId]
+    );
+}
+
+function find_category($conn, $userId, $categoryId)
+{
+    return db_fetch_one(
+        $conn,
+        'SELECT id, userid, name, type FROM categories WHERE id = ? AND userid = ? LIMIT 1',
+        'ii',
+        [$categoryId, $userId]
+    );
+}
+
+function account_name_exists($conn, $userId, $name, $excludeId = 0)
+{
+    $sql = 'SELECT id FROM accounts WHERE userid = ? AND LOWER(name) = LOWER(?)';
+    $types = 'is';
+    $params = [$userId, $name];
+
+    if ($excludeId > 0) {
+        $sql .= ' AND id <> ?';
+        $types .= 'i';
+        $params[] = $excludeId;
+    }
+
+    $sql .= ' LIMIT 1';
+    return (bool) db_fetch_one($conn, $sql, $types, $params);
+}
+
+function category_name_exists($conn, $userId, $name, $type, $excludeId = 0)
+{
+    $sql = 'SELECT id FROM categories WHERE userid = ? AND type = ? AND LOWER(name) = LOWER(?)';
+    $types = 'iss';
+    $params = [$userId, $type, $name];
+
+    if ($excludeId > 0) {
+        $sql .= ' AND id <> ?';
+        $types .= 'i';
+        $params[] = $excludeId;
+    }
+
+    $sql .= ' LIMIT 1';
+    return (bool) db_fetch_one($conn, $sql, $types, $params);
+}
+
+function validate_account_name($conn, $userId, $name, $excludeId = 0)
+{
+    $errors = [];
+
+    if ($name === '') {
+        $errors[] = 'Account name is required.';
+    } elseif (text_length($name) > 100) {
+        $errors[] = 'Account name must be 100 characters or fewer.';
+    } elseif (account_name_exists($conn, $userId, $name, $excludeId)) {
+        $errors[] = 'You already have an account with that name.';
+    }
+
+    return $errors;
+}
+
+function validate_category_input($conn, $userId, $name, $type, $excludeId = 0)
+{
+    $errors = [];
+
+    if ($name === '') {
+        $errors[] = 'Category name is required.';
+    } elseif (text_length($name) > 100) {
+        $errors[] = 'Category name must be 100 characters or fewer.';
+    }
+
+    if (!in_array($type, ['income', 'expense'], true)) {
+        $errors[] = 'Category type must be income or expense.';
+    } elseif ($name !== '' && text_length($name) <= 100 && category_name_exists($conn, $userId, $name, $type, $excludeId)) {
+        $errors[] = 'You already have a category with that name and type.';
+    }
+
+    return $errors;
+}
+
+function account_transaction_count($conn, $userId, $accountId)
+{
+    $row = db_fetch_one(
+        $conn,
+        'SELECT COUNT(*) AS total FROM transactions WHERE userid = ? AND accountid = ?',
+        'ii',
+        [$userId, $accountId]
+    );
+
+    return (int) ($row['total'] ?? 0);
+}
+
+function category_transaction_count($conn, $userId, $categoryId)
+{
+    $row = db_fetch_one(
+        $conn,
+        'SELECT COUNT(*) AS total FROM transactions WHERE userid = ? AND categoryid = ?',
+        'ii',
+        [$userId, $categoryId]
+    );
+
+    return (int) ($row['total'] ?? 0);
 }
 
 function profile_photo_url($user)

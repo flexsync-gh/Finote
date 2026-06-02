@@ -12,3 +12,10 @@ ALTER TABLE transactions
 -- The updated login code will rehash a matching plaintext password on first successful login.
 -- Optional manual reset example:
 -- UPDATE users SET password = '$2y$10$exampleReplaceWithPasswordHash' WHERE id = 1;
+
+-- Optional non-unique indexes for account/category management and transaction filters.
+-- Review existing indexes before running these in production.
+-- CREATE INDEX idx_accounts_userid_name ON accounts (userid, name);
+-- CREATE INDEX idx_categories_userid_type_name ON categories (userid, type, name);
+-- CREATE INDEX idx_transactions_userid_accountid ON transactions (userid, accountid);
+-- CREATE INDEX idx_transactions_userid_categoryid ON transactions (userid, categoryid);
