@@ -14,6 +14,8 @@ if (!$account) {
 }
 
 $name = trim($_POST['name'] ?? $account['name']);
+$type = $_POST['type'] ?? $account['type'];
+$balance = trim($_POST['balance'] ?? $account['balance']);
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -21,14 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Your session expired. Please try again.';
     }
 
-    $errors = array_merge($errors, validate_account_name($conn, $userId, $name, $accountId));
+    $errors = array_merge($errors, validate_account_input($conn, $userId, $name, $type, $balance, $accountId));
 
     if (empty($errors)) {
+        $balanceValue = normalize_decimal($balance);
+
         db_execute(
             $conn,
-            'UPDATE accounts SET name = ? WHERE id = ? AND userid = ?',
-            'sii',
-            [$name, $accountId, $userId]
+            'UPDATE accounts SET name = ?, type = ?, balance = ? WHERE id = ? AND userid = ?',
+            'ssdii',
+            [$name, $type, $balanceValue, $accountId, $userId]
         );
 
         flash('success', 'Account updated.');
@@ -66,6 +70,20 @@ require __DIR__ . '/../includes/navbar.php';
                 <div class="mb-3">
                     <label class="form-label fw-semibold" for="name">Account Name</label>
                     <input id="name" class="form-control" name="name" maxlength="100" value="<?php echo e($name); ?>" required autofocus>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="type">Account Type</label>
+                    <select id="type" class="form-select" name="type" required>
+                        <?php foreach (account_types() as $value => $label) { ?>
+                            <option value="<?php echo e($value); ?>" <?php echo $type === $value ? 'selected' : ''; ?>><?php echo e($label); ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="balance">Balance</label>
+                    <input id="balance" class="form-control" name="balance" type="number" min="0" step="0.01" value="<?php echo e($balance); ?>" required>
                 </div>
 
                 <div class="d-flex flex-wrap gap-2 mt-4">

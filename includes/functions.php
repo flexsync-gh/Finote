@@ -166,6 +166,26 @@ function money($amount)
     return 'Rp ' . number_format((float) $amount, 0, ',', '.');
 }
 
+function account_types()
+{
+    return [
+        'cash' => 'Cash',
+        'bank' => 'Bank',
+        'ewallet' => 'E-Wallet',
+    ];
+}
+
+function account_type_label($type)
+{
+    $types = account_types();
+    return $types[$type] ?? ucfirst((string) $type);
+}
+
+function normalize_decimal($value)
+{
+    return (float) str_replace(',', '.', trim((string) $value));
+}
+
 function format_date($date)
 {
     if (!$date) {
@@ -297,6 +317,28 @@ function validate_account_name($conn, $userId, $name, $excludeId = 0)
         $errors[] = 'Account name must be 100 characters or fewer.';
     } elseif (account_name_exists($conn, $userId, $name, $excludeId)) {
         $errors[] = 'You already have an account with that name.';
+    }
+
+    return $errors;
+}
+
+function validate_account_input($conn, $userId, $name, $type, $balance, $excludeId = 0)
+{
+    $errors = validate_account_name($conn, $userId, $name, $excludeId);
+
+    if (!array_key_exists($type, account_types())) {
+        $errors[] = 'Account type must be cash, bank, or ewallet.';
+    }
+
+    $balanceText = trim((string) $balance);
+    $normalizedBalance = str_replace(',', '.', $balanceText);
+
+    if ($balanceText === '') {
+        $errors[] = 'Account balance is required.';
+    } elseif (!is_numeric($normalizedBalance)) {
+        $errors[] = 'Account balance must be numeric.';
+    } elseif ((float) $normalizedBalance < 0) {
+        $errors[] = 'Account balance must be at least 0.';
     }
 
     return $errors;

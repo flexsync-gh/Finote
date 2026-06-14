@@ -8,6 +8,8 @@ $userId = current_user_id();
 $limit = account_limit();
 $accountCount = account_count($conn, $userId);
 $name = trim($_POST['name'] ?? '');
+$type = $_POST['type'] ?? 'cash';
+$balance = trim($_POST['balance'] ?? '0');
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -19,14 +21,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'You have reached the 20 account limit.';
     }
 
-    $errors = array_merge($errors, validate_account_name($conn, $userId, $name));
+    $errors = array_merge($errors, validate_account_input($conn, $userId, $name, $type, $balance));
 
     if (empty($errors)) {
+        $balanceValue = normalize_decimal($balance);
+
         db_execute(
             $conn,
             'INSERT INTO accounts (userid, name, type, balance) VALUES (?, ?, ?, ?)',
             'issd',
-            [$userId, $name, 'cash', 0]
+            [$userId, $name, $type, $balanceValue]
         );
 
         flash('success', 'Account added.');
@@ -68,6 +72,20 @@ require __DIR__ . '/../includes/navbar.php';
                     <div class="mb-3">
                         <label class="form-label fw-semibold" for="name">Account Name</label>
                         <input id="name" class="form-control" name="name" maxlength="100" value="<?php echo e($name); ?>" required autofocus>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="type">Account Type</label>
+                        <select id="type" class="form-select" name="type" required>
+                            <?php foreach (account_types() as $value => $label) { ?>
+                                <option value="<?php echo e($value); ?>" <?php echo $type === $value ? 'selected' : ''; ?>><?php echo e($label); ?></option>
+                            <?php } ?>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="balance">Balance</label>
+                        <input id="balance" class="form-control" name="balance" type="number" min="0" step="0.01" value="<?php echo e($balance); ?>" required>
                     </div>
 
                     <div class="d-flex flex-wrap gap-2 mt-4">

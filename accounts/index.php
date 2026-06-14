@@ -20,6 +20,9 @@ $accounts = db_fetch_all(
 
 $accountCount = count($accounts);
 $atLimit = $accountCount >= $limit;
+$totalBalance = array_sum(array_map(static function ($account) {
+    return (float) $account['balance'];
+}, $accounts));
 
 $pageTitle = 'Accounts - Finote';
 $activePage = 'accounts';
@@ -45,6 +48,15 @@ require __DIR__ . '/../includes/navbar.php';
             <?php } ?>
         </div>
 
+        <div class="row g-3 mb-4">
+            <div class="col-md-6 col-xl-4">
+                <div class="summary-card summary-balance p-4">
+                    <div class="small text-uppercase fw-semibold opacity-75">Total Balance</div>
+                    <div class="h3 fw-bold mb-0 mt-2"><?php echo e(money($totalBalance)); ?></div>
+                </div>
+            </div>
+        </div>
+
         <div class="app-card p-0 overflow-hidden">
             <?php if (empty($accounts)) { ?>
                 <div class="empty-state">
@@ -59,6 +71,7 @@ require __DIR__ . '/../includes/navbar.php';
                             <tr>
                                 <th>Name</th>
                                 <th>Type</th>
+                                <th class="text-end">Balance</th>
                                 <th class="text-end">Transactions</th>
                                 <th class="text-end">Actions</th>
                             </tr>
@@ -67,7 +80,12 @@ require __DIR__ . '/../includes/navbar.php';
                             <?php foreach ($accounts as $account) { ?>
                                 <tr>
                                     <td class="fw-semibold"><?php echo e($account['name']); ?></td>
-                                    <td><?php echo e(ucfirst($account['type'])); ?></td>
+                                    <td>
+                                        <span class="badge account-type-badge account-type-<?php echo e($account['type']); ?>">
+                                            <?php echo e(account_type_label($account['type'])); ?>
+                                        </span>
+                                    </td>
+                                    <td class="text-end fw-semibold"><?php echo e(money($account['balance'])); ?></td>
                                     <td class="text-end"><?php echo e($account['transaction_count']); ?></td>
                                     <td class="text-end">
                                         <div class="btn-group btn-group-sm">

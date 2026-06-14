@@ -139,6 +139,28 @@ body.app-body{
     background:#ffe4e8;
 }
 
+.account-type-badge{
+    min-width:74px;
+    padding:0.48rem 0.7rem;
+    border-radius:999px;
+    font-weight:700;
+}
+
+.account-type-cash{
+    color:#087a4c;
+    background:#dff8ed;
+}
+
+.account-type-bank{
+    color:#23418f;
+    background:#e3eaff;
+}
+
+.account-type-ewallet{
+    color:#8a4d00;
+    background:#fff0cf;
+}
+
 .empty-state{
     padding:44px 18px;
     text-align:center;
