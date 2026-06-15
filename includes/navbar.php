@@ -5,7 +5,7 @@ $navUser = $navUser ?? null;
 <nav class="navbar navbar-expand-lg app-navbar sticky-top">
     <div class="container">
         <a class="navbar-brand fw-bold" href="<?php echo e(app_url('dashboard.php')); ?>">Finote</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#appNav">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#appNav" aria-controls="appNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div id="appNav" class="collapse navbar-collapse">
@@ -14,19 +14,19 @@ $navUser = $navUser ?? null;
                     <a class="nav-link <?php echo $activePage === 'dashboard' ? 'active' : ''; ?>" href="<?php echo e(app_url('dashboard.php')); ?>">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?php echo $activePage === 'transactions' ? 'active' : ''; ?>" href="<?php echo e(app_url('transactions/index.php')); ?>">Transactions</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?php echo $activePage === 'budgets' ? 'active' : ''; ?>" href="<?php echo e(app_url('budgets/index.php')); ?>">Budgets</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?php echo $activePage === 'savings' ? 'active' : ''; ?>" href="<?php echo e(app_url('savings/index.php')); ?>">Savings</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link <?php echo $activePage === 'accounts' ? 'active' : ''; ?>" href="<?php echo e(app_url('accounts/index.php')); ?>">Accounts</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link <?php echo $activePage === 'categories' ? 'active' : ''; ?>" href="<?php echo e(app_url('categories/index.php')); ?>">Categories</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo $activePage === 'transactions' ? 'active' : ''; ?>" href="<?php echo e(app_url('transactions/index.php')); ?>">Transactions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo $activePage === 'budgets' ? 'active' : ''; ?>" href="<?php echo e(app_url('budgets/index.php')); ?>">Budget</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo $activePage === 'savings' ? 'active' : ''; ?>" href="<?php echo e(app_url('savings/index.php')); ?>">Savings</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link <?php echo $activePage === 'profile' ? 'active' : ''; ?>" href="<?php echo e(app_url('profile.php')); ?>">Profile</a>

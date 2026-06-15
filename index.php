@@ -1,228 +1,132 @@
-<?php include 'db.php'; ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Landing Page Finote</title>
-    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+<?php
+require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/includes/functions.php';
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+$pageTitle = 'Finote - Personal Finance Tracker';
+$previewImage = is_file(__DIR__ . '/Screenshot (2).png') ? app_url('Screenshot (2).png') : '';
 
-    <style>
-      body.dark-mode {
-        background-color: #121212;
-        color: #ffffff;
-      }
+require __DIR__ . '/includes/header.php';
+?>
 
-      body.dark-mode .bg-white {
-        background-color: #1e1e1e !important;
-      }
-
-      body.dark-mode .text-muted {
-        color: #bbbbbb !important;
-      }
-
-      body.dark-mode .navbar {
-        background: #1a1a2e !important;
-      }
-
-      body.dark-mode footer {
-        background: #111 !important;
-      }
-
-      body.dark-mode .card,
-      body.dark-mode .p-4 {
-        background-color: #333333 !important;
-      }
-
-      body.dark-mode footer {
-        background: #0a0a0a !important;
-        border-top: 1px solid #222;
-      }
-
-      .cta-finote {
-        background: linear-gradient(135deg,#5b3be0,#8c62ff);
-      }
-
-      body.dark-mode .cta-finote {
-        background: linear-gradient(135deg,#1a1a2e,#252541);
-      }
-
-      .prev-img{
-        background:linear-gradient(135deg,#6a3df0,#9a6bff);
-      }
-
-      .nav-link{
-        color: #ffffff;
-      }
-
-      body.dark-mode .prev-img{
-        background: linear-gradient(135deg,#1a1a2e,#252541);
-      }
-
-      .theme-toggle{
-        width:70px;
-        height:34px;
-        position:relative;
-        display:inline-flex;
-        align-items:center;
-        justify-content:space-between;
-        padding:0 10px;
-        border:1px solid rgba(255,255,255,0.32);
-        border-radius:999px;
-        background:rgba(255,255,255,0.16);
-        color:rgba(255,255,255,0.82);
-        box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08);
-      }
-
-      .theme-toggle .toggle-icon{
-        position:relative;
-        z-index:1;
-        font-size:13px;
-        line-height:1;
-      }
-
-      .theme-toggle::after{
-        content:"";
-        position:absolute;
-        top:4px;
-        left:4px;
-        width:26px;
-        height:26px;
-        border-radius:50%;
-        background:linear-gradient(135deg,#ffd76a,#ff9f43);
-        box-shadow:0 4px 10px rgba(255,159,67,0.35);
-        transition:transform 0.25s ease,background 0.25s ease;
-      }
-
-      body.dark-mode .theme-toggle{
-        background:rgba(255,255,255,0.08);
-        border-color:rgba(255,255,255,0.16);
-      }
-
-      body.dark-mode .theme-toggle::after{
-        transform:translateX(36px);
-        background:linear-gradient(135deg,#d9dcff,#8c62ff);
-        box-shadow:0 4px 10px rgba(140,98,255,0.36);
-      }
-    </style>
-</head>
-<body>
-
-<nav class="navbar navbar-expand-lg navbar-dark" style="background:#5b2be0;">
-  <div class="container">
-    <a class="navbar-brand d-flex align-items-center gap-2" href="#">
-      <!-- <img src="FINOTE.png" height="32"> -->
-      Finote
-    </a>
-
-    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div id="nav" class="collapse navbar-collapse">
-      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
-        <li class="nav-item"><a class="nav-link" href="#">Features</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">About</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Pricing</a></li>
-        <li class="nav-item">
-          <a class="btn btn-warning text-white" href="login.php">Try Now</a>
-        </li>
-        <li class="nav-item">
-          <button id="darkToggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" data-theme-toggle>
-            <span class="toggle-icon">&#9728;</span>
-            <span class="toggle-icon">&#9790;</span>
-          </button>
-        </li>
-      </ul>
+<nav class="navbar navbar-expand-lg app-navbar landing-navbar sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="<?php echo e(app_url('index.php')); ?>">Finote</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#landingNav" aria-controls="landingNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="landingNav" class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+                <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                <li class="nav-item"><a class="nav-link" href="#preview">Preview</a></li>
+                <li class="nav-item"><a class="nav-link" href="#start">Start</a></li>
+                <li class="nav-item d-flex align-items-center">
+                    <button id="darkToggle" class="app-theme-toggle" type="button" aria-label="Toggle dark mode" data-theme-toggle>
+                        <span class="toggle-icon">&#9728;</span>
+                        <span class="toggle-icon">&#9790;</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-warning text-white ms-lg-2" href="<?php echo e(app_url('login.php')); ?>">Login</a>
+                </li>
+            </ul>
+        </div>
     </div>
-  </div>
 </nav>
 
-<section class="py-5">
-  <div class="container">
-    <div class="row align-items-center g-5">
-
-      <div class="col-md-6 text-center text-md-start">
-        <h1 class="fw-bold">Manage Your Money<br>the Neat Way</h1>
-        <p class="text-muted">
-          Finote helps you track your daily expenses, saving goals, budgeting,
-          and organize your personal finances in one simple place.
-        </p>
-
-        <div class="d-flex gap-3 justify-content-center justify-content-md-start">
-          <a href="login.php" class="btn text-white" style="background:#5b2be5;">Start Tracking</a>
-          <a href="login.php" class="btn btn-warning text-white">Try Demo</a>
+<main class="landing-page">
+    <section class="landing-hero">
+        <div class="container">
+            <div class="row align-items-center g-4 g-lg-5">
+                <div class="col-lg-6">
+                    <div class="landing-copy">
+                        <span class="landing-kicker">Personal Finance Workspace</span>
+                        <h1>Finote</h1>
+                        <p>Track spending, organize accounts, plan budgets, and follow saving goals in one calm dashboard built for everyday money decisions.</p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <a class="btn btn-primary btn-lg" href="<?php echo e(app_url('login.php')); ?>">Start Tracking</a>
+                            <a class="btn btn-outline-primary btn-lg" href="#features">Explore Features</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6" id="preview">
+                    <div class="landing-preview">
+                        <?php if ($previewImage !== '') { ?>
+                            <img src="<?php echo e($previewImage); ?>" alt="Finote dashboard preview">
+                        <?php } else { ?>
+                            <div class="landing-preview-fallback">
+                                <div class="landing-preview-line"></div>
+                                <div class="landing-preview-grid">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <div class="landing-preview-chart"></div>
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+    </section>
 
-      <div class="col-md-6 text-center">
-        <div class="prev-img p-3 rounded">
-          <img src="Screenshot (2).png" class="img-fluid rounded">
+    <section id="features" class="landing-section">
+        <div class="container">
+            <div class="landing-section-heading text-center">
+                <h2 class="page-title h1 mb-2">Built for clear money habits</h2>
+                <p class="text-muted mb-0">Everything important stays close without making the workspace feel crowded.</p>
+            </div>
+
+            <div class="row g-4 mt-2">
+                <div class="col-md-4">
+                    <div class="landing-feature-card h-100">
+                        <div class="landing-feature-icon">Rp</div>
+                        <h3 class="h5 fw-bold">Expense Tracking</h3>
+                        <p>Record income and expenses with accounts, categories, dates, and useful transaction notes.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="landing-feature-card h-100">
+                        <div class="landing-feature-icon">%</div>
+                        <h3 class="h5 fw-bold">Budget Control</h3>
+                        <p>Compare monthly spending against category budgets so overspending is easier to catch early.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="landing-feature-card h-100">
+                        <div class="landing-feature-icon">Go</div>
+                        <h3 class="h5 fw-bold">Saving Goals</h3>
+                        <p>Plan goals, log deposits, and keep progress visible alongside the rest of your finances.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+    </section>
 
+    <section id="start" class="landing-cta">
+        <div class="container">
+            <div class="landing-card">
+                <div>
+                    <h2 class="h1 fw-bold mb-2">Ready to make your money easier to read?</h2>
+                    <p class="mb-0">Open Finote and start building a cleaner record of your daily finances.</p>
+                </div>
+                <a class="btn btn-warning text-white btn-lg" href="<?php echo e(app_url('login.php')); ?>">Get Started</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="landing-footer py-4">
+    <div class="container d-flex flex-column flex-md-row justify-content-between gap-3">
+        <div>
+            <strong>Finote</strong>
+            <div class="small">Personal Finance Website</div>
+        </div>
+        <div class="d-flex flex-wrap gap-3">
+            <a href="<?php echo e(app_url('login.php')); ?>">Login</a>
+            <a href="#features">Features</a>
+            <a href="#start">Start</a>
+        </div>
     </div>
-  </div>
-</section>
-
-<section class="py-5 bg-white text-center">
-  <div class="container">
-    <h2 class="mb-5">Why Finote?</h2>
-
-    <div class="row g-4 justify-content-scenter">
-
-      <div class="col-md-4">
-        <div class="p-4 rounded" style="background:#f3f0ff;">
-          <div class="fs-2">💰</div>
-          <h5>Expense Tracking</h5>
-          <p>Record and track all of your spending accurately.</p>
-        </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="p-4 rounded" style="background:#f3f0ff;">
-          <div class="fs-2">📊</div>
-          <h5>Simple Analytics</h5>
-          <p>Visualization with clean charts and graphics.</p>
-        </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="p-4 rounded" style="background:#f3f0ff;">
-          <div class="fs-2">🗒️</div>
-          <h5>Finance Notes</h5>
-          <p>Help you manage your financial goals and budgets.</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<section class="cta-finote py-5 text-center text-white">
-  <div class="container">
-    <h2>Track and control your money today</h2>
-    <p>Start managing your personal finances with Finote.</p>
-    <a href="login.php" class="btn btn-warning text-white">Get Started</a>
-  </div>
-</section>
-
-<footer class="py-4 text-white" style="background:#2c1b66;">
-  <div class="container d-flex flex-column flex-md-row justify-content-between">
-    <div>
-      <strong>Finote</strong><br>
-      <small>Personal Finance Website</small>
-    </div>
-
-    <div class="d-flex gap-3 mt-3 mt-md-0">
-      <a href="#" class="text-white text-decoration-none">Privacy</a>
-      <a href="#" class="text-white text-decoration-none">Contact</a>
-      <a href="#" class="text-white text-decoration-none">ToS & ToU</a>
-    </div>
-  </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="assets/js/theme.js"></script>
-</body>
-</html>
+<?php require __DIR__ . '/includes/footer.php'; ?>
