@@ -31,7 +31,7 @@ function app_base_path()
 {
     $dir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
 
-    if (preg_match('#/(transactions|accounts|categories)$#', $dir)) {
+    if (preg_match('#/(transactions|accounts|categories|budgets|savings)$#', $dir)) {
         $dir = dirname($dir);
     }
 
@@ -193,6 +193,12 @@ function format_date($date)
     }
 
     return date('d M Y', strtotime($date));
+}
+
+function valid_app_date($date)
+{
+    $parsed = DateTime::createFromFormat('Y-m-d', (string) $date);
+    return $parsed && $parsed->format('Y-m-d') === $date;
 }
 
 function pagination_url($page)
@@ -385,6 +391,172 @@ function category_transaction_count($conn, $userId, $categoryId)
     );
 
     return (int) ($row['total'] ?? 0);
+}
+
+function expense_categories($conn, $userId)
+{
+    return db_fetch_all($conn, 'SELECT id, name FROM categories WHERE userid = ? AND type = ? ORDER BY name', 'is', [$userId, 'expense']);
+}
+
+function find_budget($conn, $userId, $budgetId)
+{
+    return db_fetch_one(
+        $conn,
+        'SELECT b.*, c.name AS category_name
+         FROM budgets b
+         INNER JOIN categories c ON c.id = b.categoryid AND c.userid = b.userid
+         WHERE b.id = ? AND b.userid = ?
+         LIMIT 1',
+        'ii',
+        [$budgetId, $userId]
+    );
+}
+
+function budget_exists($conn, $userId, $categoryId, $month, $year, $excludeId = 0)
+{
+    $sql = 'SELECT id FROM budgets WHERE userid = ? AND categoryid = ? AND month = ? AND year = ?';
+    $types = 'iiii';
+    $params = [$userId, $categoryId, $month, $year];
+
+    if ($excludeId > 0) {
+        $sql .= ' AND id <> ?';
+        $types .= 'i';
+        $params[] = $excludeId;
+    }
+
+    $sql .= ' LIMIT 1';
+    return (bool) db_fetch_one($conn, $sql, $types, $params);
+}
+
+function validate_budget_input($conn, $userId, $categoryId, $amount, $month, $year, $excludeId = 0)
+{
+    $errors = [];
+    $amountText = trim((string) $amount);
+    $normalizedAmount = str_replace(',', '.', $amountText);
+    $month = (int) $month;
+    $year = (int) $year;
+
+    $category = db_fetch_one($conn, 'SELECT id FROM categories WHERE id = ? AND userid = ? AND type = ?', 'iis', [(int) $categoryId, $userId, 'expense']);
+    if (!$category) {
+        $errors[] = 'Choose a valid expense category.';
+    }
+
+    if ($amountText === '') {
+        $errors[] = 'Budget amount is required.';
+    } elseif (!is_numeric($normalizedAmount) || (float) $normalizedAmount <= 0) {
+        $errors[] = 'Budget amount must be numeric and greater than 0.';
+    }
+
+    if ($month < 1 || $month > 12) {
+        $errors[] = 'Choose a valid month.';
+    }
+
+    if ($year < 2000 || $year > 2100) {
+        $errors[] = 'Choose a valid year.';
+    }
+
+    if (empty($errors) && budget_exists($conn, $userId, (int) $categoryId, $month, $year, $excludeId)) {
+        $errors[] = 'You already have a budget for this category, month, and year.';
+    }
+
+    return $errors;
+}
+
+function month_options()
+{
+    return [
+        1 => 'January',
+        2 => 'February',
+        3 => 'March',
+        4 => 'April',
+        5 => 'May',
+        6 => 'June',
+        7 => 'July',
+        8 => 'August',
+        9 => 'September',
+        10 => 'October',
+        11 => 'November',
+        12 => 'December',
+    ];
+}
+
+function find_saving_goal($conn, $userId, $goalId)
+{
+    return db_fetch_one(
+        $conn,
+        'SELECT id, userid, name, target_amount, current_amount, target_date, status, created_at, updated_at
+         FROM saving_goals
+         WHERE id = ? AND userid = ?
+         LIMIT 1',
+        'ii',
+        [$goalId, $userId]
+    );
+}
+
+function sync_saving_goal_status($conn, $userId, $goalId)
+{
+    db_execute(
+        $conn,
+        "UPDATE saving_goals
+         SET status = CASE WHEN current_amount >= target_amount THEN 'completed' ELSE 'active' END
+         WHERE id = ? AND userid = ?",
+        'ii',
+        [$goalId, $userId]
+    );
+}
+
+function validate_saving_goal_input($data)
+{
+    $errors = [];
+    $name = trim($data['name'] ?? '');
+    $targetAmount = str_replace(',', '.', trim((string) ($data['target_amount'] ?? '')));
+    $currentAmount = str_replace(',', '.', trim((string) ($data['current_amount'] ?? '0')));
+    $targetDate = trim($data['target_date'] ?? '');
+    $status = $data['status'] ?? 'active';
+
+    if ($name === '') {
+        $errors[] = 'Goal name is required.';
+    } elseif (text_length($name) > 100) {
+        $errors[] = 'Goal name must be 100 characters or fewer.';
+    }
+
+    if ($targetAmount === '' || !is_numeric($targetAmount) || (float) $targetAmount <= 0) {
+        $errors[] = 'Target amount must be numeric and greater than 0.';
+    }
+
+    if ($currentAmount === '' || !is_numeric($currentAmount) || (float) $currentAmount < 0) {
+        $errors[] = 'Current amount must be numeric and at least 0.';
+    }
+
+    if (!valid_app_date($targetDate)) {
+        $errors[] = 'Choose a valid target date.';
+    }
+
+    if (!in_array($status, ['active', 'completed'], true)) {
+        $errors[] = 'Choose a valid status.';
+    }
+
+    return $errors;
+}
+
+function validate_saving_transaction_input($amount, $type, $transactionDate)
+{
+    $errors = [];
+    $amountText = str_replace(',', '.', trim((string) $amount));
+
+    if ($amountText === '' || !is_numeric($amountText) || (float) $amountText <= 0) {
+        $errors[] = 'Amount must be numeric and greater than 0.';
+    }
+
+    if (!in_array($type, ['deposit', 'withdraw'], true)) {
+        $errors[] = 'Choose deposit or withdraw.';
+    }
+
+    if (!valid_app_date($transactionDate)) {
+        $errors[] = 'Choose a valid transaction date.';
+    }
+
+    return $errors;
 }
 
 function profile_photo_url($user)

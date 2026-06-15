@@ -29,6 +29,44 @@ $recentTransactions = db_fetch_all(
 $totalIncome = (float) ($summary['total_income'] ?? 0);
 $totalExpense = (float) ($summary['total_expense'] ?? 0);
 $balance = (float) ($summary['saldo_bersih'] ?? 0);
+$budgetMonth = (int) date('n');
+$budgetYear = (int) date('Y');
+
+$savingSummary = db_fetch_one(
+    $conn,
+    "SELECT
+        SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) AS active_goals,
+        COALESCE(SUM(current_amount), 0) AS total_saved
+     FROM saving_goals
+     WHERE userid = ?",
+    'i',
+    [$userId]
+);
+
+$monthlyBudget = db_fetch_one(
+    $conn,
+    "SELECT
+        COALESCE(SUM(b.amount), 0) AS total_budget,
+        COALESCE(SUM((
+            SELECT SUM(t.amount)
+            FROM transactions t
+            WHERE t.userid = b.userid
+              AND t.categoryid = b.categoryid
+              AND t.type = 'expense'
+              AND MONTH(t.transaction_date) = b.month
+              AND YEAR(t.transaction_date) = b.year
+        )), 0) AS total_spent
+     FROM budgets b
+     WHERE b.userid = ? AND b.month = ? AND b.year = ?",
+    'iii',
+    [$userId, $budgetMonth, $budgetYear]
+);
+
+$activeGoals = (int) ($savingSummary['active_goals'] ?? 0);
+$totalSaved = (float) ($savingSummary['total_saved'] ?? 0);
+$monthlyBudgetTotal = (float) ($monthlyBudget['total_budget'] ?? 0);
+$monthlyBudgetSpent = (float) ($monthlyBudget['total_spent'] ?? 0);
+$monthlyBudgetPercent = $monthlyBudgetTotal > 0 ? min(100, ($monthlyBudgetSpent / $monthlyBudgetTotal) * 100) : 0;
 
 $pageTitle = 'Dashboard - Finote';
 $activePage = 'dashboard';
@@ -71,6 +109,32 @@ require __DIR__ . '/includes/navbar.php';
                 <div class="summary-card summary-balance p-4">
                     <p class="mb-1 opacity-75">Current Balance</p>
                     <h2 class="h3 fw-bold mb-0"><?php echo e(money($balance)); ?></h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="app-card dashboard-mini-card p-3 h-100">
+                    <p class="text-muted mb-1">Active Saving Goals</p>
+                    <div class="h4 fw-bold mb-0"><?php echo e($activeGoals); ?></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="app-card dashboard-mini-card p-3 h-100">
+                    <p class="text-muted mb-1">Total Saved</p>
+                    <div class="h4 fw-bold mb-0"><?php echo e(money($totalSaved)); ?></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="app-card dashboard-mini-card p-3 h-100">
+                    <div class="d-flex justify-content-between gap-2 mb-2">
+                        <p class="text-muted mb-0">Monthly Budget Used</p>
+                        <span class="fw-semibold"><?php echo e(number_format($monthlyBudgetPercent, 0)); ?>%</span>
+                    </div>
+                    <div class="progress budget-progress" role="progressbar" aria-valuenow="<?php echo e((int) $monthlyBudgetPercent); ?>" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar" style="width: <?php echo e($monthlyBudgetPercent); ?>%"></div>
+                    </div>
                 </div>
             </div>
         </div>
