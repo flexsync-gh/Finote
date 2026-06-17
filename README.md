@@ -107,7 +107,7 @@ If needed, run additional migrations:
 database/migrations.sql
 ```
 
-### 4. Configure database connection
+### 4. Database connection setup
 
 Update `db.php`:
 
@@ -118,7 +118,7 @@ $pass = "";
 $dbname = "web2";
 ```
 
-### 5. Run the application
+### 5. Run the website
 
 Place the project inside your web server directory:
 
