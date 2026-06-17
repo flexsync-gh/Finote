@@ -178,6 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mkdir($uploadDir, 0755, true);
     }
 
+    // profpics system
     if (!move_uploaded_file($_FILES['profile_photo']['tmp_name'], $uploadDir . $fileName)) {
         flash('error', 'Could not save the uploaded image.');
         redirect(app_url('profile.php'));

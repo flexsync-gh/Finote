@@ -73,6 +73,7 @@ $offset = ($page - 1) * $perPage;
 $listTypes = $types . 'ii';
 $listParams = array_merge($params, [$perPage, $offset]);
 
+// dynamic data 
 $transactions = db_fetch_all(
     $conn,
     "SELECT
@@ -87,7 +88,7 @@ $transactions = db_fetch_all(
      FROM $reportSource
      WHERE $whereSql
      ORDER BY v.transaction_date DESC, v.id_transaksi DESC
-     LIMIT ? OFFSET ?",
+     LIMIT ? OFFSET ?", // pagination
     $listTypes,
     $listParams
 );

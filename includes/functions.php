@@ -124,7 +124,7 @@ function bind_params($stmt, $types, $params)
     array_unshift($refs, $types);
     call_user_func_array([$stmt, 'bind_param'], $refs);
 }
-
+// prepared statement
 function db_fetch_all($conn, $sql, $types = '', $params = [])
 {
     $stmt = mysqli_prepare($conn, $sql);
@@ -146,7 +146,7 @@ function db_execute($conn, $sql, $types = '', $params = [])
     bind_params($stmt, $types, $params);
     return mysqli_stmt_execute($stmt);
 }
-
+//
 function current_user($conn)
 {
     if (!is_logged_in()) {
