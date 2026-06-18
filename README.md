@@ -136,16 +136,6 @@ http://localhost/finote
 
 ---
 
-## 📸 Preview
-
-Add screenshots here:
-
-```md
-![Dashboard](Screenshot%20(2).png)
-```
-
----
-
 ## 🔒 Security Features
 
 * Password hashing support
